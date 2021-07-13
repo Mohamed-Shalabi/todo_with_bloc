@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:todo_with_bloc/layout/main_page/cubit/main_page_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_with_bloc/layout/main_page/cubit/main_page_states.dart';
 
 class NewTodosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer(
+    return BlocConsumer<MainPageCubit, MainPageStates>(
       listener: (context, state) {},
       builder: (BuildContext context, Object? state) {
         return ListView(

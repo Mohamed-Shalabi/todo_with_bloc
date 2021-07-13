@@ -78,9 +78,7 @@ class MainPageCubit extends Cubit<MainPageStates> {
             );
       },
       onOpen: (database) async {
-        tasks = await getTasksFromDatabase();
-        emit(GetTasksFromDatabaeState());
-        print('database opened');
+        await getTasksFromDatabase(database);
       },
     ).catchError(
       (error) {
@@ -90,25 +88,30 @@ class MainPageCubit extends Cubit<MainPageStates> {
   }
 
   void insertToDatabase(String text, String date, String time) async {
-    await _database?.transaction((txn) {
-      return txn
+    await _database?.transaction((txn) async {
+      return await txn
           .rawInsert(
         'INSERT INTO Tasks(title, date, time, status) VALUES("$text", "$date", "$time", "")',
       )
           .then(
-        (value) async {
-          tasks = await getTasksFromDatabase();
-          emit(GetTasksFromDatabaeState());
-          print('database opened');
+        (value) {
+          print('inserted successfully');
+          getTasksFromDatabase(_database!).then((value) => print(tasks));
         },
       ).catchError((error) {
         print(error.toString());
+        print('error');
       });
     });
-    print('inserted successfully');
   }
 
-  Future<List<Map>> getTasksFromDatabase() async {
-    return await _database!.rawQuery('SELECT * FROM Tasks');
+  Future<void> getTasksFromDatabase(Database database) async {
+    await database.rawQuery('SELECT * FROM Tasks').then((value) {
+      tasks = value;
+      print(tasks);
+    }).catchError((error) {
+      print(error.toString());
+    });
+    emit(GetTasksFromDatabaeState());
   }
 }
